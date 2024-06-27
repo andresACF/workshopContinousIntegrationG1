@@ -17,7 +17,7 @@ def test_select_plan_invalid_then_valid_message(gym_membership):
     with patch('builtins.input', side_effect=['Invalid', 'Basic']), \
          patch('builtins.print') as mock_print:
         gym_membership.select_plan()
-        mock_print.assert_any_call("Error: Invalid membership plan selected.")
+        mock_print.assert_any_call("Error: Invalid or unavailable membership plan selected.")
         assert gym_membership.selected_plan == 'Basic'
 
 # Group Membership Tests
@@ -34,17 +34,17 @@ def test_set_group_membership_invalid_then_valid(gym_membership):
         assert gym_membership.total_members == 4
 
 # Customize Plan Tests
-@patch('builtins.input', side_effect=['1, 3'])
+@patch('builtins.input', side_effect=['1, 5'])
 def test_customize_plan_valid(mock_input, gym_membership):
     gym_membership.customize_plan()
     assert 'Personal Training' in gym_membership.selected_features
     assert 'Exclusive gym facilities' in gym_membership.selected_features
 
 def test_customize_plan_invalid_message(gym_membership):
-    expected_output = "Feature number 5 is not available."
+    expected_output = "Feature number 9 is not available."
 
     with patch('sys.stdout', new=StringIO()) as fake_out, \
-         patch('builtins.input', side_effect=['5','1']):
+         patch('builtins.input', side_effect=['9','1']):
         
         try:
             gym_membership.customize_plan()
@@ -94,7 +94,7 @@ def test_calculate_cost_with_total_cost_grater_than_200_lower_than_400(gym_membe
 
 # Confirm Membership Tests
 @patch('sys.stdout', new_callable=StringIO)
-@patch('builtins.input', side_effect=['confirm'])
+@patch('builtins.input', side_effect=['yes'])
 def test_confirm_membership_confirm(mock_input, mock_stdout, gym_membership):
     gym_membership.selected_plan = 'Family'
     gym_membership.total_members = 2
@@ -111,11 +111,19 @@ def test_confirm_membership_confirm(mock_input, mock_stdout, gym_membership):
     assert mock_stdout.getvalue() == expected_output
 
 @patch('sys.stdout', new_callable=StringIO)
-@patch('builtins.input', side_effect=['cancel'])
+@patch('builtins.input', side_effect=['no'])
 def test_confirm_membership_cancel(mock_input, mock_stdout, gym_membership):
     gym_membership.selected_plan = 'Family'
     gym_membership.total_members = 2
     gym_membership.selected_features = ['Group Classes', 'Specialized training programs']
-    assert gym_membership.confirm_membership() == 350
-
-    assert mock_stdout.getvalue().strip() == '-1'
+    assert gym_membership.confirm_membership() == int('-1')
+    
+    expected_output = (
+        "Membership Plan Confirmation\n"
+        f"Selected Plan: {gym_membership.selected_plan}\n"
+        f"Additional Features: {', '.join(gym_membership.selected_features) or 'None'}\n"
+        "Total Cost: $350\n"
+        "Membership plan canceled.\n"
+    )
+    
+    assert mock_stdout.getvalue() == expected_output
