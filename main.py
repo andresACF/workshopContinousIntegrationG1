@@ -1,4 +1,3 @@
-
 class GymMembership:
     def __init__(self):
         self.membership_plans = {
@@ -17,75 +16,6 @@ class GymMembership:
         self.selected_plan = None
         self.selected_features = []
         self.total_members = 1
-    
-    def display_plan(self):
-        for num, (plan, details) in enumerate(self.membership_plans.items(), start=1):
-            print(f"Plan {num}: {plan}")
-            print(f"Price: ${details[0]}")
-            print(f"Trainer: {details[1]}")
-            print(f"Daily Time: {details[2]}")
-            print("----------------------")
-
-    def input_promt_plan(self):
-        self.display_plan()
-        plan_selected = int(input("\nSelect one plan with the number: \n"))
-        number_members = int(input("\nWho many members?:  \n"))
-        
-        if plan_selected == 1:
-            self.members_plan[0] += number_members
-        elif plan_selected == 2:
-            self.members_plan[1] += number_members
-        elif plan_selected == 3:
-            self.members_plan[2] += number_members
-        
-        def discounts_group_memberships(self):
-    index = 0
-    base_cost = 0
-    for k in self.memberships_plan.keys:
-        if (self.plan_selected == 1):
-            index = 0
-            base_cost = self.memberships_plan.get(k)[1]
-        elif (self.plan_selected == 2):
-            index = 1
-            base_cost = self.memberships_plan.get(k)[1]
-        else:
-            index = 2
-            base_cost = self.memberships_plan.get(k)[1]
-    num_members = self.members_plan[index]
-    total_cost = base_cost * num_members
-    if num_members >= 2:
-        discount = total_cost * 0.10
-        total_cost -= discount
-        print(f"A 10% discount has been applied for group membership. You saved ${discount:.2f}.")
-    else:
-        print(f"Sign up with one or more friends to receive a 10% discount!")
-
-    return total_cost
-
-def special_offer_discounts(total_cost):
-    if (total_cost > 400):
-        total_cost = total_cost - 50
-        print(f"A discount of $50 has been apply")
-        return total_cost
-    elif (total_cost > 200):
-        total_cost = total_cost - 20
-        print(f"A discount of $20 has been apply")
-        return total_cost
-    print(f"You don't meet the requirements to apply a discount")
-    return total_cost
-
-premium_features = ["access to exclusive gym facilities", "specialized training programs"]
-
-def premium_membership_cost(base_cost, premium_features_cost, is_premium):
-    total_cost = base_cost + premium_features_cost
-    if is_premium:
-        surcharge = total_cost * 0.15
-        total_cost += surcharge
-        print(f"A 15% surcharge has been applied for premium membership features. The surcharge amount is ${surcharge:.2f}.")
-    else:
-        print("No premium features selected.")
-
-    return total_cost
 
     def display_plans(self):
         print("Available Membership Plans:")
@@ -120,3 +50,71 @@ def premium_membership_cost(base_cost, premium_features_cost, is_premium):
         for num, feature in self.premium_features.items():
             print(f"{num}. {feature['name']} (Premium): ${feature['cost']}")
 
+    def customize_plan(self):
+        try:
+            self.display_additional_features()
+            features = input("Enter the numbers of the additional features you wish to add (comma-separated): ").split(',')
+            feature_numbers = [int(feature.strip()) for feature in features]
+            for num in feature_numbers:
+                if num in self.additional_features:
+                    self.selected_features.append(self.additional_features[num]['name'])
+                elif num in self.premium_features:
+                    self.selected_features.append(self.premium_features[num]['name'])
+                else:
+                    raise ValueError(f"Feature number {num} is not available.")
+        except (ValueError, KeyError) as e:
+            print(f"Error: {e}")
+            self.customize_plan()
+
+    def calculate_cost(self):
+        base_cost = (self.membership_plans[self.selected_plan]['cost']) * self.total_members
+        features_cost = sum(self.additional_features[num]['cost'] for num in range(1, 3) if self.additional_features[num]['name'] in self.selected_features)
+        premium_features_cost = sum(self.premium_features[num]['cost'] for num in range(3, 5) if self.premium_features[num]['name'] in self.selected_features)
+        total_cost = base_cost + features_cost + premium_features_cost
+
+        if self.total_members >= 2:
+            total_cost *= 0.9
+        print("COSTO AÑAMEMBY: ", total_cost)
+        if total_cost > 400:
+            total_cost -= 50
+        elif total_cost > 200:
+            total_cost -= 20
+
+        if any(feature in self.selected_features for feature in ['Exclusive gym facilities', 'Specialized training programs']):
+            total_cost *= 1.15
+
+        return round(total_cost)
+
+    def confirm_membership(self):
+        try:
+            total_cost = self.calculate_cost()
+            print("Membership Plan Confirmation")
+            print(f"Selected Plan: {self.selected_plan}")
+            print(f"Additional Features: {', '.join(self.selected_features) or 'None'}")
+            print(f"Total Cost: ${total_cost}")
+            return total_cost
+        except ValueError as e:
+            print(f"Error: {str(e)}")
+            return -1
+
+def main():
+    gym_membership = GymMembership()
+
+    # Display plans
+    gym_membership.display_plans()
+
+    # Select a plan
+    gym_membership.select_plan()
+
+    # Set group membership
+    gym_membership.set_group_membership()
+
+    # Customize with additional features
+    gym_membership.customize_plan()
+
+    # Confirm membership
+    total_cost = gym_membership.confirm_membership()
+    print(f"Total Membership Cost: ${total_cost}")
+
+if __name__ == "__main__":
+    main()
