@@ -74,7 +74,6 @@ class GymMembership:
 
         if self.total_members >= 2:
             total_cost *= 0.9
-        print("COSTO AÑAMEMBY: ", total_cost)
         if total_cost > 400:
             total_cost -= 50
         elif total_cost > 200:
@@ -99,20 +98,10 @@ class GymMembership:
 
 def main():
     gym_membership = GymMembership()
-
-    # Display plans
     gym_membership.display_plans()
-
-    # Select a plan
     gym_membership.select_plan()
-
-    # Set group membership
     gym_membership.set_group_membership()
-
-    # Customize with additional features
     gym_membership.customize_plan()
-
-    # Confirm membership
     total_cost = gym_membership.confirm_membership()
     print(f"Total Membership Cost: ${total_cost}")
 
