@@ -49,3 +49,72 @@ class GymMembership:
             print(f"{num}. {feature['name']}: ${feature['cost']}")
         for num, feature in self.premium_features.items():
             print(f"{num}. {feature['name']} (Premium): ${feature['cost']}")
+
+    def customize_plan(self):
+        try:
+            self.display_additional_features()
+            features = input("Enter the numbers of the additional features you wish to add (comma-separated): ").split(',')
+            feature_numbers = [int(feature.strip()) for feature in features]
+            for num in feature_numbers:
+                if num in self.additional_features:
+                    self.selected_features.append(self.additional_features[num]['name'])
+                elif num in self.premium_features:
+                    self.selected_features.append(self.premium_features[num]['name'])
+                else:
+                    raise ValueError(f"Feature number {num} is not available.")
+        except (ValueError, KeyError) as e:
+            print(f"Error: {e}")
+            self.customize_plan()
+
+    def calculate_cost(self):
+        base_cost = (self.membership_plans[self.selected_plan]['cost']) * self.total_members
+        features_cost = sum(self.additional_features[num]['cost'] for num in range(1, 3) if self.additional_features[num]['name'] in self.selected_features)
+        premium_features_cost = sum(self.premium_features[num]['cost'] for num in range(3, 5) if self.premium_features[num]['name'] in self.selected_features)
+        total_cost = base_cost + features_cost + premium_features_cost
+
+        if self.total_members >= 2:
+            total_cost *= 0.9
+        print("COSTO AÑAMEMBY: ", total_cost)
+        if total_cost > 400:
+            total_cost -= 50
+        elif total_cost > 200:
+            total_cost -= 20
+
+        if any(feature in self.selected_features for feature in ['Exclusive gym facilities', 'Specialized training programs']):
+            total_cost *= 1.15
+
+        return round(total_cost)
+
+    def confirm_membership(self):
+        try:
+            total_cost = self.calculate_cost()
+            print("Membership Plan Confirmation")
+            print(f"Selected Plan: {self.selected_plan}")
+            print(f"Additional Features: {', '.join(self.selected_features) or 'None'}")
+            print(f"Total Cost: ${total_cost}")
+            return total_cost
+        except ValueError as e:
+            print(f"Error: {str(e)}")
+            return -1
+
+def main():
+    gym_membership = GymMembership()
+
+    # Display plans
+    gym_membership.display_plans()
+
+    # Select a plan
+    gym_membership.select_plan()
+
+    # Set group membership
+    gym_membership.set_group_membership()
+
+    # Customize with additional features
+    gym_membership.customize_plan()
+
+    # Confirm membership
+    total_cost = gym_membership.confirm_membership()
+    print(f"Total Membership Cost: ${total_cost}")
+
+if __name__ == "__main__":
+    main()
