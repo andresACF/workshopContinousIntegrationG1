@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import patch
+from io import StringIO
 
 from main import GymMembership
 
@@ -38,7 +39,7 @@ class TestGymMembership(unittest.TestCase):
         self.gym_membership.customize_plan()
         self.assertIn('Personal Training', self.gym_membership.selected_features)
         self.assertIn('Group Classes', self.gym_membership.selected_features)
-
+    
     def test_calculate_cost_plan_no_features(self):
         self.gym_membership.selected_plan = 'Premium'
         self.gym_membership.total_members = 1
@@ -75,6 +76,44 @@ class TestGymMembership(unittest.TestCase):
         self.gym_membership.total_members = 2
         self.gym_membership.selected_features = ['Personal Training']
         self.assertEqual(self.gym_membership.calculate_cost(), 277)  
+    
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('builtins.input', side_effect=['confirm'])
+    def test_confirm_membership_confirm(self, mock_input,mock_stdout):
+        self.gym_membership.selected_plan = 'Family'
+        self.gym_membership.total_members = 2
+        self.gym_membership.selected_features = ['Group Classes', 'Specialized training programs']
+        self.assertEqual(self.gym_membership.confirm_membership(), 350)
+
+
+        expected_output = (
+            "Membership Plan Confirmation\n"
+            f"Selected Plan: {self.gym_membership.selected_plan}\n"
+            f"Additional Features: {', '.join(self.gym_membership.selected_features) or 'None'}\n"
+            "Total Cost: $350\n"
+        )
+
+        self.assertEqual(mock_stdout.getvalue(), expected_output)
+
+
+    @patch('sys.stdout', new_callable=StringIO)
+    @patch('builtins.input', side_effect=['cancel'])
+    def test_confirm_membership_cancel(self, mock_input,mock_stdout):
+        self.gym_membership.selected_plan = 'Family'
+        self.gym_membership.total_members = 2
+        self.gym_membership.selected_features = ['Group Classes', 'Specialized training programs']
+        self.assertEqual(self.gym_membership.confirm_membership(), 350)
+
+
+        expected_output = (
+            "Membership Plan Confirmation\n"
+            f"Selected Plan: {self.gym_membership.selected_plan}\n"
+            f"Additional Features: {', '.join(self.gym_membership.selected_features) or 'None'}\n"
+            "-1\n"
+        )
+
+        self.assertEqual(mock_stdout.getvalue(), -1)
+
 
 
 if __name__ == '__main__':
