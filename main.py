@@ -28,7 +28,7 @@ class GymMembership:
             if plan in self.membership_plans:
                 self.selected_plan = plan
             else:
-                raise ValueError("Invalid membership plan selected.")
+                raise ValueError("Invalid or unavailable membership plan selected.")
         except ValueError as e:
             print(f"Error: {e}")
             self.select_plan()
