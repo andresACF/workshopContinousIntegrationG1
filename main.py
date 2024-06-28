@@ -102,7 +102,7 @@ class GymMembership:
             if confirm == 'yes':
                 return total_cost
             else:
-                print("Membership plan canceled.")
+                print("Membership plan canceled!.")
                 return -1
         except ValueError as e:
             print(f"Error: {str(e)}")
