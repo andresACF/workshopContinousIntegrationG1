@@ -28,7 +28,7 @@ class GymMembership:
             if plan in self.membership_plans:
                 self.selected_plan = plan
             else:
-                raise ValueError("Invalid or unavailable membership plan selected.")
+                raise ValueError("Invalid membership plan selected.")
         except ValueError as e:
             print(f"Error: {e}")
             self.select_plan()
@@ -68,32 +68,29 @@ class GymMembership:
 
     def calculate_cost(self):
         base_cost = (self.membership_plans[self.selected_plan]['cost']) * self.total_members
-        features_cost = sum(self.additional_features[num]['cost'] for num in range(1, 3) if self.additional_features[num]['name'] in self.selected_features)
-        premium_features_cost = sum(self.premium_features[num]['cost'] for num in range(3, 5) if self.premium_features[num]['name'] in self.selected_features)
-        total_cost = base_cost + features_cost + premium_features_cost
+        features_cost = sum(self.additional_features[num]['cost'] if num in self.additional_features else self.premium_features[num]['cost'] for num in range(1, 5) if self.additional_features.get(num) or self.premium_features.get(num) and self.additional_features.get(num, {}).get('name') in self.selected_features or self.premium_features.get(num, {}).get('name') in self.selected_features)
+        total_cost = base_cost + features_cost
 
-        if self.total_members >= 2:
+        if self.total_members >= 4:
             total_cost *= 0.9
         if total_cost > 400:
-            total_cost -= 50
+            total_cost *= 0.85
         elif total_cost > 200:
-            total_cost -= 20
-
-        if any(feature in self.selected_features for feature in ['Exclusive gym facilities', 'Specialized training programs']):
-            total_cost *= 1.15
-
-        return round(total_cost)
+            total_cost *= 0.9
+        
+        return total_cost
 
     def confirm_membership(self):
-        try:
-            total_cost = self.calculate_cost()
-            print("Membership Plan Confirmation")
-            print(f"Selected Plan: {self.selected_plan}")
-            print(f"Additional Features: {', '.join(self.selected_features) or 'None'}")
-            print(f"Total Cost: ${total_cost}")
+        print("Membership Plan Confirmation")
+        print(f"Selected Plan: {self.selected_plan}")
+        print(f"Additional Features: {', '.join(self.selected_features) or 'None'}")
+        total_cost = self.calculate_cost()
+        print(f"Total Cost: ${total_cost}")
+        confirm = input("Confirm your membership plan (yes/no): ").strip().lower()
+        if confirm == 'yes':
             return total_cost
-        except ValueError as e:
-            print(f"Error: {str(e)}")
+        else:
+            print("Membership plan canceled.")
             return -1
 
 def main():
