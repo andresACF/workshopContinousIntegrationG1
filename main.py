@@ -98,7 +98,7 @@ class GymMembership:
             print(f"Selected Plan: {self.selected_plan}")
             print(f"Additional Features: {', '.join(self.selected_features) or 'None'}")
             print(f"Total Cost: ${total_cost}")
-            confirm = input("Do you wish to confirm the membership (yes/no)? ").strip().lower()
+            confirm = input("Do you wish to confirm the membership (Yes/No)? ").strip().lower()
             if confirm == 'yes':
                 return total_cost
             else:
@@ -120,3 +120,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
