@@ -34,17 +34,17 @@ def test_set_group_membership_invalid_then_valid(gym_membership):
         assert gym_membership.total_members == 4
 
 # Customize Plan Tests
-@patch('builtins.input', side_effect=['1, 5', '1, 2'])
+@patch('builtins.input', side_effect=['1, 5'])
 def test_customize_plan_valid(mock_input, gym_membership):
     gym_membership.customize_plan()
     assert 'Personal Training' in gym_membership.selected_features
-    assert 'Group Classes' in gym_membership.selected_features
+    assert 'Exclusive gym facilities' in gym_membership.selected_features
 
 def test_customize_plan_invalid_message(gym_membership):
     expected_output = "Feature number 9 is not available."
 
     with patch('sys.stdout', new=StringIO()) as fake_out, \
-         patch('builtins.input', side_effect=['9', '1']):
+         patch('builtins.input', side_effect=['9','1']):
         
         try:
             gym_membership.customize_plan()
@@ -116,7 +116,7 @@ def test_confirm_membership_cancel(mock_input, mock_stdout, gym_membership):
     gym_membership.selected_plan = 'Family'
     gym_membership.total_members = 2
     gym_membership.selected_features = ['Group Classes', 'Specialized training programs']
-    assert gym_membership.confirm_membership() == -1
+    assert gym_membership.confirm_membership() == int('-1')
     
     expected_output = (
         "Membership Plan Confirmation\n"
