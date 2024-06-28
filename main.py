@@ -40,7 +40,7 @@ class GymMembership:
 
     def set_group_membership(self):
         try:
-            members_count = int(input("Enter the number of members for the group membership: "))
+            members_count = int(input("Enter the number of members for group membership: "))
             if members_count < 1:
                 raise ValueError("Number of members must be at least 1.")
             self.total_members = members_count
